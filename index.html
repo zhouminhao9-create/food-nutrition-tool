@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="format-detection" content="telephone=no">
+    <title>饮食营养记录分析工具</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍽️ 饮食营养记录</h1>
+            <p>记录每餐，了解营养</p>
+        </header>
+
+        <!-- 餐食记录模块 -->
+        <section class="record-section">
+            <h2>📷 记录餐食</h2>
+            
+            <!-- 图片上传区域 -->
+            <div class="image-upload">
+                <label class="upload-label">
+                    <input type="file" accept="image/*" capture="environment" id="imageInput">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📸</div>
+                        <p class="upload-title">点击拍照或上传图片</p>
+                        <p class="hint">支持 JPG、PNG 格式</p>
+                    </div>
+                </label>
+                <div class="preview-container" id="previewContainer" style="display: none;">
+                    <img id="previewImage" src="" alt="菜品预览">
+                    <button class="delete-btn" id="deleteImageBtn" aria-label="删除图片"></button>
+                </div>
+            </div>
+
+            <!-- 文字录入区域 -->
+            <div class="text-inputs">
+                <div class="input-group">
+                    <label for="ingredients">🥬 食材清单</label>
+                    <textarea id="ingredients" placeholder="请输入食材，如：鸡胸肉、西兰花、米饭、番茄..." rows="3"></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="seasonings">🧂 使用的调味品</label>
+                    <textarea id="seasonings" placeholder="请输入调味品，如：盐、酱油、橄榄油..." rows="2"></textarea>
+                </div>
+            </div>
+
+            <!-- 提交按钮 -->
+            <button class="submit-btn" id="submitBtn">
+                <span class="btn-icon">🔍</span>
+                <span class="btn-text">开始营养分析</span>
+            </button>
+        </section>
+
+        <!-- 分析结果加载提示 -->
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>正在分析营养成分...</p>
+        </div>
+
+        <!-- 智能营养分析模块 -->
+        <section class="analysis-section" id="analysisSection" style="display: none;">
+            <h2>📊 营养分析结果</h2>
+            
+            <!-- 本餐含有的营养物质 -->
+            <div class="result-card positive">
+                <h3>✅ 含有的营养物质</h3>
+                <div class="nutrient-categories">
+                    <div class="category">
+                        <h4>宏量营养素</h4>
+                        <ul id="macroNutrients"></ul>
+                    </div>
+                    <div class="category">
+                        <h4>微量营养素</h4>
+                        <ul id="microNutrients"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 营养缺口分析 -->
+            <div class="result-card gap">
+                <h3>⚠️ 缺少的营养物质</h3>
+                <div id="nutrientGap"></div>
+            </div>
+        </section>
+
+        <!-- 历史记录模块 -->
+        <section class="history-section">
+            <h2>📜 历史记录</h2>
+            <div id="historyList">
+                <div class="empty-state">
+                    <div class="empty-icon">📝</div>
+                    <p>暂无历史记录</p>
+                    <p class="hint">记录您的第一餐开始吧！</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="nutrition.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
