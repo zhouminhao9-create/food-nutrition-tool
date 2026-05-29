@@ -1,5 +1,6 @@
 // DOM 元素
-const imageInput = document.getElementById('imageInput');
+const imageInputCamera = document.getElementById('imageInputCamera');
+const imageInputGallery = document.getElementById('imageInputGallery');
 const uploadArea = document.getElementById('uploadArea');
 const previewContainer = document.getElementById('previewContainer');
 const previewImage = document.getElementById('previewImage');
@@ -13,6 +14,10 @@ const macroNutrientsList = document.getElementById('macroNutrients');
 const microNutrientsList = document.getElementById('microNutrients');
 const nutrientGap = document.getElementById('nutrientGap');
 const historyList = document.getElementById('historyList');
+const uploadMenuOverlay = document.getElementById('uploadMenuOverlay');
+const takePhotoBtn = document.getElementById('takePhotoBtn');
+const chooseFromGalleryBtn = document.getElementById('chooseFromGalleryBtn');
+const cancelUploadBtn = document.getElementById('cancelUploadBtn');
 
 // 当前图片数据
 let currentImageData = null;
@@ -46,7 +51,7 @@ function initMobileOptimizations() {
         }, { passive: false });
     }
 
-    // 检测是否为iOS设备
+    // 检测是否为 iOS 设备
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     if (isIOS) {
         document.body.classList.add('ios-device');
@@ -61,10 +66,60 @@ function initMobileOptimizations() {
             });
         });
     }
+    
+    // 初始化上传菜单事件
+    initUploadMenu();
 }
 
-// 图片上传处理
-imageInput.addEventListener('change', handleImageUpload);
+// 初始化上传菜单
+function initUploadMenu() {
+    // 点击上传区域显示菜单
+    uploadArea.addEventListener('click', (e) => {
+        e.preventDefault();
+        showUploadMenu();
+    });
+    
+    // 拍照按钮
+    takePhotoBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        hideUploadMenu();
+        imageInputCamera.click();
+    });
+    
+    // 从相册选择按钮
+    chooseFromGalleryBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        hideUploadMenu();
+        imageInputGallery.click();
+    });
+    
+    // 取消按钮
+    cancelUploadBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        hideUploadMenu();
+    });
+    
+    // 点击遮罩关闭
+    uploadMenuOverlay.addEventListener('click', (e) => {
+        if (e.target === uploadMenuOverlay) {
+            hideUploadMenu();
+        }
+    });
+    
+    // 监听文件选择
+    imageInputCamera.addEventListener('change', handleImageUpload);
+    imageInputGallery.addEventListener('change', handleImageUpload);
+}
+
+// 显示上传菜单
+function showUploadMenu() {
+    uploadMenuOverlay.style.display = 'flex';
+}
+
+// 隐藏上传菜单
+function hideUploadMenu() {
+    uploadMenuOverlay.style.display = 'none';
+}
 
 // 删除图片
 deleteImageBtn.addEventListener('click', (e) => {
@@ -116,10 +171,11 @@ submitBtn.addEventListener('click', () => {
 function handleImageUpload(event) {
     const file = event.target.files[0];
     if (file) {
-        // 检查文件大小（限制10MB）
+        // 检查文件大小（限制 10MB）
         if (file.size > 10 * 1024 * 1024) {
-            showToast('图片大小不能超过10MB');
-            imageInput.value = '';
+            showToast('图片大小不能超过 10MB');
+            imageInputCamera.value = '';
+            imageInputGallery.value = '';
             return;
         }
 
@@ -129,7 +185,8 @@ function handleImageUpload(event) {
             previewImage.src = currentImageData;
             uploadArea.parentElement.style.display = 'none';
             previewContainer.style.display = 'block';
-            imageInput.value = ''; // 清空文件选择，确保下次选择相同文件也能触发上传
+            imageInputCamera.value = '';
+            imageInputGallery.value = '';
         };
         reader.onerror = () => {
             showToast('图片读取失败，请重试');

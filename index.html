@@ -22,17 +22,31 @@
             
             <!-- 图片上传区域 -->
             <div class="image-upload">
-                <label class="upload-label">
-                    <input type="file" accept="image/*" capture="environment" id="imageInput">
-                    <div class="upload-area" id="uploadArea">
-                        <div class="upload-icon">📸</div>
-                        <p class="upload-title">点击拍照或上传图片</p>
-                        <p class="hint">支持 JPG、PNG 格式</p>
-                    </div>
-                </label>
+                <input type="file" accept="image/*" id="imageInputCamera" style="display: none;" capture="environment">
+                <input type="file" accept="image/*" id="imageInputGallery" style="display: none;">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📸</div>
+                    <p class="upload-title">点击拍照或上传图片</p>
+                    <p class="hint">支持 JPG、PNG 格式</p>
+                </div>
                 <div class="preview-container" id="previewContainer" style="display: none;">
                     <img id="previewImage" src="" alt="菜品预览">
                     <button class="delete-btn" id="deleteImageBtn" aria-label="删除图片"></button>
+                </div>
+            </div>
+            
+            <!-- 上传选项弹出菜单 -->
+            <div class="upload-menu-overlay" id="uploadMenuOverlay" style="display: none;">
+                <div class="upload-menu">
+                    <button class="upload-menu-item" id="takePhotoBtn">
+                        <span class="menu-icon">📷</span>
+                        <span class="menu-text">拍照</span>
+                    </button>
+                    <button class="upload-menu-item" id="chooseFromGalleryBtn">
+                        <span class="menu-icon">🖼️</span>
+                        <span class="menu-text">从相册选择</span>
+                    </button>
+                    <button class="upload-menu-cancel" id="cancelUploadBtn">取消</button>
                 </div>
             </div>
 
