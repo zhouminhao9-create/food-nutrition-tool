@@ -61,11 +61,8 @@ const resultMealNote = document.getElementById('resultMealNote');
 
 // 收起/展开按钮
 const expandPositive = document.getElementById('expandPositive');
-const expandGap = document.getElementById('expandGap');
-const expandSuggestions = document.getElementById('expandSuggestions');
 
 const gapCard = document.getElementById('gapCard');
-const suggestionsCard = document.getElementById('suggestionsCard');
 
 const calendarTitle = document.getElementById('calendarTitle');
 const calendarDays = document.getElementById('calendarDays');
@@ -222,10 +219,8 @@ function bindEvents() {
     // 提交分析
     submitBtn.addEventListener('click', submitAnalysis);
 
-    // 收起/展开功能
+    // 收起/展开功能（仅保留营养充足）
     expandPositive.addEventListener('click', () => toggleExpand(positiveNutrients, expandPositive));
-    expandGap.addEventListener('click', () => toggleExpand(gapNutrients, expandGap));
-    expandSuggestions.addEventListener('click', () => toggleExpand(suggestionsList, expandSuggestions));
 
     // 日历导航
     prevMonthBtn.addEventListener('click', () => {
@@ -474,7 +469,8 @@ function submitAnalysis() {
     
     // 模拟分析延迟
     setTimeout(() => {
-        const result = analyzeNutrition(ingredients, seasoningsTextarea.value.trim());
+        const allItems = ingredients + '、' + seasoningsTextarea.value.trim();
+        const result = nutritionAnalyzer.analyze(allItems);
         
         // 记录行为学习数据（仅当需要建议时）
         const excludeFromStats = (category === 'snack') || (suggestionMode === 'viewOnly');
@@ -526,11 +522,6 @@ function recordBehavior(category) {
     localStorage.setItem('timeBehaviorData', JSON.stringify(timeBehaviorData));
 }
 
-function analyzeNutrition(ingredients, seasonings) {
-    const allItems = ingredients + '、' + seasonings;
-    return nutritionAnalyzer.analyze(allItems);
-}
-
 function showResult(result, record) {
     currentAnalysisResult = result;
     
@@ -563,23 +554,20 @@ function showResult(result, record) {
         `<div class="nutrient-tag">${nutrient.name}</div>`
     ).join('');
     
+    // 融合展示：营养缺口 + 补充来源
     if (result.gap.length > 0) {
-        gapNutrients.innerHTML = result.gap.map(nutrient => 
-            `<div class="nutrient-tag gap">${nutrient.name}</div>`
-        ).join('');
+        gapNutrients.innerHTML = result.gap.map(nutrient => `
+            <div class="nutrient-item">
+                <div class="nutrient-header">
+                    <span class="nutrient-icon">⚠️</span>
+                    <span class="nutrient-name">${nutrient.name}</span>
+                </div>
+                <div class="nutrient-source">💡 ${nutrient.source}</div>
+            </div>
+        `).join('');
         gapCard.style.display = 'block';
     } else {
         gapCard.style.display = 'none';
-    }
-    
-    // 显示补充建议（仅正餐+需要建议模式）
-    if (showSuggestions && result.suggestions.length > 0) {
-        suggestionsList.innerHTML = result.suggestions.map(suggestion => 
-            `<div class="suggestion-item">${suggestion}</div>`
-        ).join('');
-        suggestionsCard.style.display = 'block';
-    } else {
-        suggestionsCard.style.display = 'none';
     }
     
     // 更新标签

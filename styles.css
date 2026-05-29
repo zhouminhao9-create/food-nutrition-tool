@@ -847,8 +847,39 @@ body {
 
 .nutrient-list {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.nutrient-item {
+    background: #fff3e0;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    border-left: 4px solid var(--warning-color);
+}
+
+.nutrient-header {
+    display: flex;
+    align-items: center;
     gap: var(--spacing-sm);
+    margin-bottom: 8px;
+}
+
+.nutrient-icon {
+    font-size: 1.2rem;
+}
+
+.nutrient-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--warning-color);
+}
+
+.nutrient-source {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    padding-left: calc(1.2rem + var(--spacing-sm));
+    line-height: 1.5;
 }
 
 .nutrient-tag {

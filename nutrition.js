@@ -96,7 +96,8 @@ function analyzeNutrition(ingredients, seasonings) {
         if (!allDetected.includes(essential)) {
             result.missingNutrients.push({
                 name: essential,
-                suggestion: supplementSuggestions[essential]
+                suggestion: supplementSuggestions[essential],
+                source: supplementSuggestions[essential]
             });
         }
     }
@@ -131,8 +132,50 @@ function isMealFood(ingredients) {
     return false;
 }
 
+// 全局导出供前端使用
+const nutritionAnalyzer = {
+    analyze: function(inputStr) {
+        // 处理空输入
+        if (!inputStr || inputStr.trim() === '') {
+            return {
+                positive: [],
+                gap: [],
+                suggestions: []
+            };
+        }
+        
+        // 使用多种分隔符解析食材字符串
+        const separators = /[,，、\n\s]+/;
+        const parts = inputStr.split(separators).filter(p => p && p.trim());
+        
+        // 简单分类：调味品和食材
+        const ingList = parts.filter(p => !['盐', '酱油', '醋', '油', '糖', '料酒', '蚝油', '生抽', '老抽'].some(s => p.includes(s)));
+        const seaList = parts.filter(p => ['盐', '酱油', '醋', '油', '糖', '料酒', '蚝油', '生抽', '老抽'].some(s => p.includes(s)));
+        
+        const result = analyzeNutrition(ingList.join('、'), seaList.join('、'));
+        
+        // 融合营养缺口和补充建议
+        const gapWithSources = result.missingNutrients.slice(0, 5).map(n => ({
+            name: n.name,
+            source: n.source
+        }));
+        
+        return {
+            positive: [...result.macroNutrients, ...result.microNutrients].map(n => ({ name: n })),
+            gap: gapWithSources,
+            suggestions: [] // 不再单独返回建议，已融合到 gap 中
+        };
+    },
+    nutritionDatabase,
+    essentialNutrients,
+    supplementSuggestions,
+    isNonMealFood,
+    isMealFood
+};
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { 
+        nutritionAnalyzer,
         analyzeNutrition, 
         nutritionDatabase, 
         essentialNutrients, 
