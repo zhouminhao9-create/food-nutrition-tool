@@ -6,112 +6,364 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="format-detection" content="telephone=no">
-    <title>饮食营养记录分析工具</title>
+    <title>饮食营养记录</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🍽️ 饮食营养记录</h1>
-            <p>记录每餐，了解营养</p>
-        </header>
-
-        <!-- 餐食记录模块 -->
-        <section class="record-section">
-            <h2>📷 记录餐食</h2>
-            
-            <!-- 图片上传区域 -->
-            <div class="image-upload">
-                <input type="file" accept="image/*" id="imageInputCamera" style="display: none;" capture="environment">
-                <input type="file" accept="image/*" id="imageInputGallery" style="display: none;">
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">📸</div>
-                    <p class="upload-title">点击拍照或上传图片</p>
-                    <p class="hint">支持 JPG、PNG 格式</p>
-                </div>
-                <div class="preview-container" id="previewContainer" style="display: none;">
-                    <img id="previewImage" src="" alt="菜品预览">
-                    <button class="delete-btn" id="deleteImageBtn" aria-label="删除图片"></button>
-                </div>
+        <!-- 首页入口 -->
+        <div class="home-page" id="homePage">
+            <div class="home-content">
+                <div class="home-icon">🍽️</div>
+                <h1>饮食营养记录</h1>
+                <button class="main-btn" id="startRecordBtn">
+                    <span class="btn-icon">📝</span>
+                    <span class="btn-text">记录一餐</span>
+                </button>
+                <button class="secondary-btn" id="viewHistoryBtn">
+                    <span class="btn-icon">📅</span>
+                    <span class="btn-text">历史记录</span>
+                </button>
+                <button class="settings-btn" id="settingsBtn">
+                    <span class="btn-icon">⚙️</span>
+                    <span class="btn-text">设置</span>
+                </button>
             </div>
-            
-            <!-- 上传选项弹出菜单 -->
-            <div class="upload-menu-overlay" id="uploadMenuOverlay" style="display: none;">
-                <div class="upload-menu">
-                    <button class="upload-menu-item" id="takePhotoBtn">
-                        <span class="menu-icon">📷</span>
-                        <span class="menu-text">拍照</span>
-                    </button>
-                    <button class="upload-menu-item" id="chooseFromGalleryBtn">
-                        <span class="menu-icon">🖼️</span>
-                        <span class="menu-text">从相册选择</span>
-                    </button>
-                    <button class="upload-menu-cancel" id="cancelUploadBtn">取消</button>
-                </div>
-            </div>
-
-            <!-- 文字录入区域 -->
-            <div class="text-inputs">
-                <div class="input-group">
-                    <label for="ingredients">🥬 食材清单</label>
-                    <textarea id="ingredients" placeholder="请输入食材，如：鸡胸肉、西兰花、米饭、番茄..." rows="3"></textarea>
-                </div>
-                <div class="input-group">
-                    <label for="seasonings">🧂 使用的调味品</label>
-                    <textarea id="seasonings" placeholder="请输入调味品，如：盐、酱油、橄榄油..." rows="2"></textarea>
-                </div>
-            </div>
-
-            <!-- 提交按钮 -->
-            <button class="submit-btn" id="submitBtn">
-                <span class="btn-icon">🔍</span>
-                <span class="btn-text">开始营养分析</span>
-            </button>
-        </section>
-
-        <!-- 分析结果加载提示 -->
-        <div class="loading" id="loading" style="display: none;">
-            <div class="spinner"></div>
-            <p>正在分析营养成分...</p>
         </div>
 
-        <!-- 智能营养分析模块 -->
-        <section class="analysis-section" id="analysisSection" style="display: none;">
-            <h2>📊 营养分析结果</h2>
+        <!-- 设置弹窗 -->
+        <div class="settings-overlay" id="settingsOverlay" style="display: none;">
+            <div class="settings-modal">
+                <div class="modal-header">
+                    <h3>设置</h3>
+                    <button class="close-btn" id="closeSettingsBtn">×</button>
+                </div>
+                <div class="modal-content">
+                    <button class="setting-item" id="resetMemoryBtn">
+                        <span class="setting-icon">🔄</span>
+                        <span class="setting-text">重置行为学习记忆</span>
+                    </button>
+                    <button class="setting-item" id="clearCacheBtn">
+                        <span class="setting-icon">🗑️</span>
+                        <span class="setting-text">清空图片缓存</span>
+                    </button>
+                    <button class="setting-item" id="clearAllBtn">
+                        <span class="setting-icon">⚠️</span>
+                        <span class="setting-text">清空所有数据</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 记录页面 -->
+        <div class="record-page" id="recordPage" style="display: none;">
+            <div class="page-header">
+                <button class="back-btn" id="backToHomeBtn">←</button>
+                <h2>记录一餐</h2>
+            </div>
             
-            <!-- 本餐含有的营养物质 -->
-            <div class="result-card positive">
-                <h3>✅ 含有的营养物质</h3>
-                <div class="nutrient-categories">
-                    <div class="category">
-                        <h4>宏量营养素</h4>
-                        <ul id="macroNutrients"></ul>
+            <div class="record-content">
+                <!-- 用餐分类 -->
+                <div class="input-section">
+                    <div class="section-title">
+                        <span class="icon">🍴</span>
+                        <span>用餐分类</span>
                     </div>
-                    <div class="category">
-                        <h4>微量营养素</h4>
-                        <ul id="microNutrients"></ul>
+                    <div class="meal-category">
+                        <label class="category-item">
+                            <input type="radio" name="mealCategory" value="breakfast">
+                            <span class="category-icon">🌅</span>
+                            <span class="category-text">早餐</span>
+                        </label>
+                        <label class="category-item">
+                            <input type="radio" name="mealCategory" value="lunch">
+                            <span class="category-icon">☀️</span>
+                            <span class="category-text">午餐</span>
+                        </label>
+                        <label class="category-item">
+                            <input type="radio" name="mealCategory" value="dinner">
+                            <span class="category-icon">🌙</span>
+                            <span class="category-text">晚餐</span>
+                        </label>
+                        <label class="category-item">
+                            <input type="radio" name="mealCategory" value="snack">
+                            <span class="category-icon">🍪</span>
+                            <span class="category-text">下午茶/零食</span>
+                        </label>
                     </div>
+                </div>
+
+                <!-- 营养建议开关 -->
+                <div class="input-section suggestion-toggle" id="suggestionToggle" style="display: none;">
+                    <div class="section-title">
+                        <span class="icon">💡</span>
+                        <span>营养建议</span>
+                    </div>
+                    <div class="toggle-group">
+                        <label class="toggle-item">
+                            <input type="radio" name="suggestionMode" value="suggest">
+                            <span class="toggle-text">需要建议</span>
+                        </label>
+                        <label class="toggle-item">
+                            <input type="radio" name="suggestionMode" value="viewOnly">
+                            <span class="toggle-text">仅查看成分</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 图片上传区域 -->
+                <div class="image-upload">
+                    <input type="file" accept="image/*" id="imageInputCamera" style="display: none;" capture="environment">
+                    <input type="file" accept="image/*" id="imageInputGallery" style="display: none;">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📸</div>
+                        <p class="upload-title">拍照或上传图片</p>
+                    </div>
+                    <div class="preview-container" id="previewContainer" style="display: none;">
+                        <img id="previewImage" src="" alt="菜品预览">
+                        <button class="delete-btn" id="deleteImageBtn" aria-label="删除图片"></button>
+                    </div>
+                </div>
+
+                <!-- 上传选项弹出菜单 -->
+                <div class="upload-menu-overlay" id="uploadMenuOverlay" style="display: none;">
+                    <div class="upload-menu">
+                        <button class="upload-menu-item" id="takePhotoBtn">
+                            <span class="menu-icon">📷</span>
+                            <span class="menu-text">拍照</span>
+                        </button>
+                        <button class="upload-menu-item" id="chooseFromGalleryBtn">
+                            <span class="menu-icon">🖼️</span>
+                            <span class="menu-text">从相册选择</span>
+                        </button>
+                        <button class="upload-menu-cancel" id="cancelUploadBtn">取消</button>
+                    </div>
+                </div>
+
+                <!-- 食材输入区 -->
+                <div class="input-section">
+                    <div class="section-title">
+                        <span class="icon">🥬</span>
+                        <span>食材</span>
+                    </div>
+                    <div class="input-with-suggestions">
+                        <textarea id="ingredients" placeholder="输入食材名称..."></textarea>
+                        <div class="suggestions-dropdown" id="ingredientsSuggestions"></div>
+                    </div>
+                    <!-- 常用食材勾选区 -->
+                    <div class="favorites-section" id="favoriteIngredients">
+                        <div class="favorites-header">
+                            <span>常用食材</span>
+                            <button class="clear-btn" id="clearFavIngredients" style="display: none;">清空</button>
+                        </div>
+                        <div class="favorites-tags" id="favIngredientsTags"></div>
+                    </div>
+                </div>
+
+                <!-- 调料输入区 -->
+                <div class="input-section">
+                    <div class="section-title">
+                        <span class="icon">🧂</span>
+                        <span>调味品</span>
+                    </div>
+                    <textarea id="seasonings" placeholder="输入调味品..."></textarea>
+                    <!-- 常用调料勾选区 -->
+                    <div class="favorites-section" id="favoriteSeasonings">
+                        <div class="favorites-header">
+                            <span>常用调料</span>
+                            <button class="clear-btn" id="clearFavSeasonings" style="display: none;">清空</button>
+                        </div>
+                        <div class="favorites-tags" id="favSeasoningsTags"></div>
+                    </div>
+                </div>
+
+                <!-- 用餐时间 -->
+                <div class="input-section">
+                    <div class="section-title">
+                        <span class="icon">🕐</span>
+                        <span>用餐时间</span>
+                    </div>
+                    <input type="time" id="mealTime" class="time-input">
+                </div>
+
+                <!-- 备注栏 -->
+                <div class="input-section">
+                    <div class="section-title">
+                        <span class="icon">📝</span>
+                        <span>备注（选填）</span>
+                    </div>
+                    <input type="text" id="mealNote" class="note-input" placeholder="口味、吃法、特殊情况...">
                 </div>
             </div>
 
-            <!-- 营养缺口分析 -->
-            <div class="result-card gap">
-                <h3>⚠️ 缺少的营养物质</h3>
-                <div id="nutrientGap"></div>
+            <!-- 底部固定提交按钮 -->
+            <div class="bottom-bar">
+                <button class="submit-btn" id="submitBtn">
+                    <span class="btn-icon">🔍</span>
+                    <span class="btn-text">分析营养</span>
+                </button>
             </div>
-        </section>
+        </div>
 
-        <!-- 历史记录模块 -->
-        <section class="history-section">
-            <h2>📜 历史记录</h2>
-            <div id="historyList">
-                <div class="empty-state">
-                    <div class="empty-icon">📝</div>
-                    <p>暂无历史记录</p>
-                    <p class="hint">记录您的第一餐开始吧！</p>
+        <!-- 分析结果页面 -->
+        <div class="result-page" id="resultPage" style="display: none;">
+            <div class="page-header">
+                <button class="back-btn" id="backToRecordBtn">←</button>
+                <h2>营养分析</h2>
+                <span id="mealTypeBadge" class="meal-type-badge" style="display: none;"></span>
+            </div>
+            
+            <div class="result-content">
+                <!-- 餐食照片 -->
+                <div class="result-image" id="resultImageContainer" style="display: none;">
+                    <img id="resultImage" src="" alt="餐食照片">
+                </div>
+
+                <!-- 餐食信息 -->
+                <div class="result-card info-card">
+                    <div class="card-header">
+                        <span class="card-icon">📋</span>
+                        <span class="card-title">餐食信息</span>
+                    </div>
+                    <div class="meal-info">
+                        <div class="info-row">
+                            <span class="info-label">分类</span>
+                            <span class="info-value" id="resultMealCategory"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">时间</span>
+                            <span class="info-value" id="resultMealTime"></span>
+                        </div>
+                        <div class="info-row" id="resultNoteRow" style="display: none;">
+                            <span class="info-label">备注</span>
+                            <span class="info-value" id="resultMealNote"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 营养亮点 -->
+                <div class="result-card positive">
+                    <div class="card-header">
+                        <span class="card-icon">✅</span>
+                        <span class="card-title">营养充足</span>
+                        <button class="expand-btn" id="expandPositive">▼</button>
+                    </div>
+                    <div class="nutrient-list expanded" id="positiveNutrients"></div>
+                </div>
+
+                <!-- 营养缺口（融合补充建议） -->
+                <div class="result-card gap" id="gapCard" style="display: none;">
+                    <div class="card-header">
+                        <span class="card-icon">⚠️</span>
+                        <span class="card-title">需要补充</span>
+                        <button class="expand-btn" id="expandGap">▼</button>
+                    </div>
+                    <div class="nutrient-list expanded" id="gapNutrients"></div>
+                </div>
+
+                <!-- 补充建议 -->
+                <div class="suggestions-card" id="suggestionsCard" style="display: none;">
+                    <div class="card-header">
+                        <span class="card-icon">💡</span>
+                        <span class="card-title">补充建议</span>
+                        <button class="expand-btn" id="expandSuggestions">▼</button>
+                    </div>
+                    <div class="suggestions-list expanded" id="suggestionsList"></div>
                 </div>
             </div>
-        </section>
+
+            <div class="bottom-bar">
+                <button class="submit-btn secondary" id="newRecordBtn">
+                    <span class="btn-icon">➕</span>
+                    <span class="btn-text">记录下一餐</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 历史记录页面 -->
+        <div class="history-page" id="historyPage" style="display: none;">
+            <div class="page-header">
+                <button class="back-btn" id="backFromHistoryBtn">←</button>
+                <h2>历史记录</h2>
+            </div>
+            
+            <div class="history-content">
+                <!-- 日历视图 -->
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <button class="calendar-nav" id="prevMonthBtn">‹</button>
+                        <span class="calendar-title" id="calendarTitle"></span>
+                        <button class="calendar-nav" id="nextMonthBtn">›</button>
+                    </div>
+                    <div class="calendar-weekdays">
+                        <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+                    </div>
+                    <div class="calendar-days" id="calendarDays"></div>
+                </div>
+
+                <!-- 当日记录列表 -->
+                <div class="daily-records" id="dailyRecords">
+                    <div class="daily-title" id="dailyTitle">选择日期查看记录</div>
+                    <div class="records-list" id="recordsList">
+                        <div class="empty-state">
+                            <div class="empty-icon">📝</div>
+                            <p>暂无记录</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 编辑记录弹窗 -->
+        <div class="edit-overlay" id="editOverlay" style="display: none;">
+            <div class="edit-modal">
+                <div class="modal-header">
+                    <h3>编辑记录</h3>
+                    <button class="close-btn" id="closeEditBtn">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="edit-meal-category">
+                        <label class="category-item">
+                            <input type="radio" name="editMealCategory" value="breakfast">
+                            <span class="category-icon">🌅</span>
+                            <span class="category-text">早餐</span>
+                        </label>
+                        <label class="category-item">
+                            <input type="radio" name="editMealCategory" value="lunch">
+                            <span class="category-icon">☀️</span>
+                            <span class="category-text">午餐</span>
+                        </label>
+                        <label class="category-item">
+                            <input type="radio" name="editMealCategory" value="dinner">
+                            <span class="category-icon">🌙</span>
+                            <span class="category-text">晚餐</span>
+                        </label>
+                        <label class="category-item">
+                            <input type="radio" name="editMealCategory" value="snack">
+                            <span class="category-icon">🍪</span>
+                            <span class="category-text">下午茶/零食</span>
+                        </label>
+                    </div>
+                    <input type="time" id="editMealTime" class="time-input">
+                    <input type="text" id="editMealNote" class="note-input" placeholder="备注...">
+                    <textarea id="editIngredients" placeholder="食材..."></textarea>
+                    <textarea id="editSeasonings" placeholder="调味品..."></textarea>
+                    <div class="modal-actions">
+                        <button class="modal-btn cancel" id="cancelEditBtn">取消</button>
+                        <button class="modal-btn delete" id="confirmDeleteBtn">删除记录</button>
+                        <button class="modal-btn confirm" id="confirmEditBtn">保存修改</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 加载提示 -->
+        <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p id="loadingText">分析中...</p>
+            </div>
+        </div>
     </div>
 
     <script src="nutrition.js"></script>

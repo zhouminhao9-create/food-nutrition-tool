@@ -21,7 +21,19 @@ const nutritionDatabase = {
     },
     
     // 常见调味品
-    seasonings: ['盐', '酱油', '醋', '糖', '料酒', '蚝油', '生抽', '老抽', '花椒', '八角', '桂皮', '姜', '蒜', '葱', '辣椒', '香油', '橄榄油', '花生油']
+    seasonings: ['盐', '酱油', '醋', '糖', '料酒', '蚝油', '生抽', '老抽', '花椒', '八角', '桂皮', '姜', '蒜', '葱', '辣椒', '香油', '橄榄油', '花生油'],
+    
+    // 非正餐食品分类
+    nonMealCategories: {
+        coffee: ['咖啡', '拿铁', '美式', '卡布奇诺', '摩卡', '浓缩咖啡', '黑咖啡'],
+        tea: ['奶茶', '红茶', '绿茶', '花茶', '水果茶', '柠檬茶', '乌龙茶', '普洱茶'],
+        dessert: ['蛋糕', '饼干', '冰淇淋', '巧克力', '糖果', '布丁', '甜甜圈', '蛋挞'],
+        snack: ['薯片', '坚果', '瓜子', '花生', '饼干', '巧克力', '糖果', '辣条', '蜜饯'],
+        beverage: ['可乐', '雪碧', '果汁', '汽水', '饮料', '苏打水', '气泡水']
+    },
+    
+    // 正餐食材特征
+    mealFoods: ['米饭', '面条', '馒头', '粥', '肉', '鱼', '虾', '鸡蛋', '豆腐', '蔬菜', '汤', '炒菜', '炖菜', '煮菜']
 };
 
 // 必需营养素列表（用于判断缺失）
@@ -55,14 +67,10 @@ function analyzeNutrition(ingredients, seasonings) {
         missingNutrients: []
     };
 
-    // 将输入转换为小写并分割成数组
     const ingredientList = ingredients.toLowerCase().split(/[,，、\s]+/).filter(item => item.trim());
     const seasoningList = seasonings.toLowerCase().split(/[,，、\s]+/).filter(item => item.trim());
-    
-    // 合并食材和调味品
     const allItems = [...ingredientList, ...seasoningList];
 
-    // 识别宏量营养素
     for (const [nutrient, foods] of Object.entries(nutritionDatabase.macroNutrients)) {
         for (const food of foods) {
             if (allItems.some(item => item.includes(food.toLowerCase()))) {
@@ -73,7 +81,6 @@ function analyzeNutrition(ingredients, seasonings) {
         }
     }
 
-    // 识别微量营养素
     for (const [nutrient, foods] of Object.entries(nutritionDatabase.microNutrients)) {
         for (const food of foods) {
             if (allItems.some(item => item.includes(food.toLowerCase()))) {
@@ -84,7 +91,6 @@ function analyzeNutrition(ingredients, seasonings) {
         }
     }
 
-    // 判断缺失的营养素
     const allDetected = [...result.macroNutrients, ...result.microNutrients];
     for (const essential of essentialNutrients) {
         if (!allDetected.includes(essential)) {
@@ -98,7 +104,40 @@ function analyzeNutrition(ingredients, seasonings) {
     return result;
 }
 
-// 导出函数供外部使用
+// 判断是否为非正餐食品
+function isNonMealFood(ingredients, seasonings) {
+    const allItems = [...ingredients.toLowerCase().split(/[,，、\s]+/), ...seasonings.toLowerCase().split(/[,，、\s]+/)]
+        .filter(item => item.trim());
+    
+    for (const [category, foods] of Object.entries(nutritionDatabase.nonMealCategories)) {
+        for (const food of foods) {
+            if (allItems.some(item => item.includes(food.toLowerCase()))) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+// 判断是否为正餐食材
+function isMealFood(ingredients) {
+    const ingredientList = ingredients.toLowerCase().split(/[,，、\s]+/).filter(item => item.trim());
+    
+    for (const food of nutritionDatabase.mealFoods) {
+        if (ingredientList.some(item => item.includes(food.toLowerCase()))) {
+            return true;
+        }
+    }
+    return false;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { analyzeNutrition, nutritionDatabase, essentialNutrients, supplementSuggestions };
+    module.exports = { 
+        analyzeNutrition, 
+        nutritionDatabase, 
+        essentialNutrients, 
+        supplementSuggestions,
+        isNonMealFood,
+        isMealFood
+    };
 }
